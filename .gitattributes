@@ -1,0 +1,35 @@
+# Auto detect text files
+* text= auto
+
+# ...Unless the name matches the following
+# overriding patterns
+
+# Definitively text files
+*.txt eol=lf
+*.md eol=lf
+*.js eol=lf
+*.php eol=lf
+*.html eol=lf
+*.json eol=lf
+*.xml eol=lf
+*.lock eol=lf
+*.env eol=lf
+*.example eol=lf
+.gitattributes eol=lf
+.gitignore eol=lf
+artisan eol=lf
+*.css eol=lf
+*.scss eol=lf
+*.ino eol=lf
+*.cpp eol=lf
+*.h eol=lf
+
+# Ensure those won't be messed up with
+*.jpg binary
+*.png binary
+*.ico binary
+*.gif binary
+*.data binary
+*.ttf binary
+*.docx binary
+*.pdf binary
