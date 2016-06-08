@@ -1,19 +1,24 @@
-int sensorPin = A0; // select the input pin for the potentiometer
-int ledPin = 13; // select the pin for the LED
-int sensorValue = 0; // variable to store the value coming from the sensor
+int lightSensorPin = A0; // select the input pin for the potentiometer
+int led13Pin = 13; // select the pin for the LED
+int lightSensorValue = 0; // variable to store the value coming from the sensor
+
+void lightSensorLoop()
+{
+	lightSensorValue = analogRead(lightSensorPin);
+	digitalWrite(led13Pin, HIGH);
+	delay(lightSensorValue);
+	digitalWrite(led13Pin, LOW);
+	delay(lightSensorValue);
+	Serial.println(lightSensorValue, DEC);
+}
 
 void setup()
 {
-  pinMode(ledPin, OUTPUT);
-  Serial.begin(9600);
+	Serial.begin(9600);
+	pinMode(led13Pin, OUTPUT);
 }
- 
+
 void loop()
 {
-  sensorValue = analogRead(sensorPin);
-  digitalWrite(ledPin, HIGH);
-  delay(sensorValue);
-  digitalWrite(ledPin, LOW);
-  delay(sensorValue);
-  Serial.println(sensorValue, DEC);
+	lightSensorLoop();
 }
