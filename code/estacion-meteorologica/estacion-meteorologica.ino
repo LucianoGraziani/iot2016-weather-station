@@ -1,3 +1,14 @@
+/////////////////////
+// Pin used
+////////////////////
+//
+// D2 HumidityAndTemperature
+// D20 (SDA) BMP085
+// D21 (SCL) BMP085
+//
+// A6 LightSensor
+// A0 MoistureEC5
+
 // Dependencies
 #include <cactus_io_DHT22.h>
 #include <Wire.h>
@@ -16,8 +27,12 @@ DHT22 dht(DHT22_PIN);
 // Generals
 int led13Pin = 13;
 
+// Moisture sensor
+int moisturePin = A0;
+int moistureValue = 0;
+
 // Light sensor
-int lightSensorPin = A0;
+int lightSensorPin = A6;
 int lightSensorValue = 0;
 
 // BMP085
@@ -42,6 +57,29 @@ float bmp085_altitude;
 // Functions for each device
 
 // Format: sensorNameSetup() and sensorNameLoop()
+
+/////////////////////////////
+// MoistureEC5
+/////////////////////////////
+void moistureEC5Loop()
+{
+	// Reset analogReference
+	analogReference(INTERNAL1V1);
+	delay(500);
+
+	// Process started indicator
+	digitalWrite(led13Pin, HIGH);
+
+	moistureValue = analogRead(moisturePin);
+	Serial.print("MoistureEC5: "); Serial.println(moistureValue, DEC);
+
+	// Process finished indicator
+	digitalWrite(led13Pin, LOW);
+
+	// Reset analogReference
+	analogReference(DEFAULT);
+	delay(1500);
+}
 
 /////////////////////////////
 // BMP085
@@ -189,7 +227,6 @@ void humidityAndTemperatureSetup()
 	dht.begin();
 	Serial.println("DHT sensor setup finished.");
 }
-// Uses D2 for output data
 void humidityAndTemperatureLoop()
 {
 	// Process started indicator
@@ -223,8 +260,6 @@ void humidityAndTemperatureLoop()
 /////////////////////////////
 // Light level Sensor
 /////////////////////////////
-
-// Uses A0 output for data
 void lightSensorLoop()
 {
 	// Process started indicator
@@ -254,6 +289,7 @@ void setup()
 
 void loop()
 {
+	moistureEC5Loop();
 	humidityAndTemperatureLoop();
 	lightSensorLoop();
 	bmp085Loop();

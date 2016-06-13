@@ -4,6 +4,9 @@ int lightSensorValue = 0; // variable to store the value coming from the sensor
 
 void lightSensorLoop()
 {
+	// Reset analogReference
+	analogReference(DEFAULT);
+	delay(500);
 	lightSensorValue = analogRead(lightSensorPin);
 	digitalWrite(led13Pin, HIGH);
 	delay(lightSensorValue);
