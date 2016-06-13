@@ -4,14 +4,14 @@
   date: 1/18/11
   updated: 2/26/13
   license: CC BY-SA v3.0 - http://creativecommons.org/licenses/by-sa/3.0/
-  
-  Get pressure and temperature from the BMP085 and calculate 
+
+  Get pressure and temperature from the BMP085 and calculate
   altitude. Serial.print it out at 9600 baud to serial monitor.
 
   Update (7/19/11): I've heard folks may be encountering issues
-  with this code, who're running an Arduino at 8MHz. If you're 
-  using an Arduino Pro 3.3V/8MHz, or the like, you may need to 
-  increase some of the delays in the bmp085ReadUP and 
+  with this code, who're running an Arduino at 8MHz. If you're
+  using an Arduino Pro 3.3V/8MHz, or the like, you may need to
+  increase some of the delays in the bmp085ReadUP and
   bmp085ReadUT functions.
 */
 
@@ -19,59 +19,67 @@
 
 #define BMP085_ADDRESS 0x77  // I2C address of BMP085
 
-const unsigned char OSS = 0;  // Oversampling Setting
+const unsigned char bmp085_OSS = 0;  // Oversampling Setting
 
 // Calibration values
-int ac1;
-int ac2; 
-int ac3; 
-unsigned int ac4;
-unsigned int ac5;
-unsigned int ac6;
-int b1; 
-int b2;
-int mb;
-int mc;
-int md;
+int bmp085_ac1;
+int bmp085_ac2;
+int bmp085_ac3;
+unsigned int bmp085_ac4;
+unsigned int bmp085_ac5;
+unsigned int bmp085_ac6;
+int bmp085_b1;
+int bmp085_b2;
+int bmp085_mb;
+int bmp085_mc;
+int bmp085_md;
 
-// b5 is calculated in bmp085GetTemperature(...), this variable is also used in bmp085GetPressure(...)
+// bmp085_b5 is calculated in bmp085GetTemperature(...), this variable is also used in bmp085GetPressure(...)
 // so ...Temperature(...) must be called before ...Pressure(...).
-long b5; 
+long bmp085_b5;
 
-short temperature;
-long pressure;
+short bmp085_temperature;
+long bmp085_pressure;
 
 // Use these for altitude conversions
-const float p0 = 101325;     // Pressure at sea level (Pa)
-float altitude;
+const float bmp085_p0 = 101325;     // Pressure at sea level (Pa)
+float bmp085_altitude;
 
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("Initialize: start");
-  Wire.begin();
-  bmp085Calibration();
-  Serial.println("Initialize: end");
+  bmp085Setup();
 }
 
 void loop()
 {
-  temperature = bmp085GetTemperature(bmp085ReadUT());
-  pressure = bmp085GetPressure(bmp085ReadUP());
-  altitude = (float)44330 * (1 - pow(((float) pressure/p0), 0.190295));
+  bmp085Loop();
+}
+
+void bmp085Loop()
+{
+  bmp085_temperature = bmp085GetTemperature(bmp085ReadUT());
+  bmp085_pressure = bmp085GetPressure(bmp085ReadUP());
+  bmp085_altitude = (float) 44330 * (1 - pow(((float) bmp085_pressure/bmp085_p0), 0.190295));
 
   Serial.print("Temperature: ");
-  Serial.print(temperature, DEC);
+  Serial.print(bmp085_temperature, DEC);
   Serial.println(" *0.1 deg C");
   Serial.print("Pressure: ");
-  Serial.print(pressure, DEC);
+  Serial.print(bmp085_pressure, DEC);
   Serial.println(" Pa");
   Serial.print("Altitude: ");
-  Serial.print(altitude, 2);
+  Serial.print(bmp085_altitude, 2);
   Serial.println(" m");
   Serial.println();
-  
+
   delay(1000);
+}
+
+void bmp085Setup()
+{
+  Wire.begin();
+  bmp085Calibration();
 }
 
 // Stores all of the bmp085's calibration values into global variables
@@ -79,19 +87,19 @@ void loop()
 // This function should be called at the beginning of the program
 void bmp085Calibration()
 {
-  Serial.println("Calibration: start");
-  ac1 = bmp085ReadInt(0xAA);
-  ac2 = bmp085ReadInt(0xAC);
-  ac3 = bmp085ReadInt(0xAE);
-  ac4 = bmp085ReadInt(0xB0);
-  ac5 = bmp085ReadInt(0xB2);
-  ac6 = bmp085ReadInt(0xB4);
-  b1 = bmp085ReadInt(0xB6);
-  b2 = bmp085ReadInt(0xB8);
-  mb = bmp085ReadInt(0xBA);
-  mc = bmp085ReadInt(0xBC);
-  md = bmp085ReadInt(0xBE);
-  Serial.println("Calibration: end");
+  Serial.println("[BMP085] Calibration: start");
+  bmp085_ac1 = bmp085ReadInt(0xAA);
+  bmp085_ac2 = bmp085ReadInt(0xAC);
+  bmp085_ac3 = bmp085ReadInt(0xAE);
+  bmp085_ac4 = bmp085ReadInt(0xB0);
+  bmp085_ac5 = bmp085ReadInt(0xB2);
+  bmp085_ac6 = bmp085ReadInt(0xB4);
+  bmp085_b1 = bmp085ReadInt(0xB6);
+  bmp085_b2 = bmp085ReadInt(0xB8);
+  bmp085_mb = bmp085ReadInt(0xBA);
+  bmp085_mc = bmp085ReadInt(0xBC);
+  bmp085_md = bmp085ReadInt(0xBE);
+  Serial.println("[BMP085] Calibration: end");
 }
 
 // Calculate temperature given ut.
@@ -99,47 +107,47 @@ void bmp085Calibration()
 short bmp085GetTemperature(unsigned int ut)
 {
   long x1, x2;
-  
-  x1 = (((long)ut - (long)ac6)*(long)ac5) >> 15;
-  x2 = ((long)mc << 11)/(x1 + md);
-  b5 = x1 + x2;
 
-  return ((b5 + 8)>>4);  
+  x1 = (((long)ut - (long)bmp085_ac6) * (long)bmp085_ac5) >> 15;
+  x2 = ((long)bmp085_mc << 11)/(x1 + bmp085_md);
+  bmp085_b5 = x1 + x2;
+
+  return ((bmp085_b5 + 8)>>4);
 }
 
 // Calculate pressure given up
 // calibration values must be known
-// b5 is also required so bmp085GetTemperature(...) must be called first.
-// Value returned will be pressure in units of Pa.
+// bmp085_b5 is also required so bmp085GetTemperature(...) must be called first.
+// Value returned will be bmp085_pressure in units of Pa.
 long bmp085GetPressure(unsigned long up)
 {
   long x1, x2, x3, b3, b6, p;
   unsigned long b4, b7;
-  
-  b6 = b5 - 4000;
+
+  b6 = bmp085_b5 - 4000;
   // Calculate B3
-  x1 = (b2 * (b6 * b6)>>12)>>11;
-  x2 = (ac2 * b6)>>11;
+  x1 = (bmp085_b2 * (b6 * b6)>>12)>>11;
+  x2 = (bmp085_ac2 * b6)>>11;
   x3 = x1 + x2;
-  b3 = (((((long)ac1)*4 + x3)<<OSS) + 2)>>2;
-  
+  b3 = (((((long)bmp085_ac1)*4 + x3)<<bmp085_OSS) + 2)>>2;
+
   // Calculate B4
-  x1 = (ac3 * b6)>>13;
-  x2 = (b1 * ((b6 * b6)>>12))>>16;
+  x1 = (bmp085_ac3 * b6)>>13;
+  x2 = (bmp085_b1 * ((b6 * b6)>>12))>>16;
   x3 = ((x1 + x2) + 2)>>2;
-  b4 = (ac4 * (unsigned long)(x3 + 32768))>>15;
-  
-  b7 = ((unsigned long)(up - b3) * (50000>>OSS));
+  b4 = (bmp085_ac4 * (unsigned long)(x3 + 32768))>>15;
+
+  b7 = ((unsigned long)(up - b3) * (50000>>bmp085_OSS));
   if (b7 < 0x80000000)
     p = (b7<<1)/b4;
   else
     p = (b7/b4)<<1;
-    
+
   x1 = (p>>8) * (p>>8);
   x1 = (x1 * 3038)>>16;
   x2 = (-7357 * p)>>16;
   p += (x1 + x2 + 3791)>>4;
-  
+
   return p;
 }
 
@@ -147,15 +155,14 @@ long bmp085GetPressure(unsigned long up)
 char bmp085Read(unsigned char address)
 {
   unsigned char data;
-  
+
   Wire.beginTransmission(BMP085_ADDRESS);
   Wire.write(address);
   Wire.endTransmission();
-  
+
   Wire.requestFrom(BMP085_ADDRESS, 1);
-  while(!Wire.available())
-    ;
-    
+  while(!Wire.available());
+
   return Wire.read();
 }
 
@@ -165,17 +172,17 @@ char bmp085Read(unsigned char address)
 int bmp085ReadInt(unsigned char address)
 {
   unsigned char msb, lsb;
-  
+
   Wire.beginTransmission(BMP085_ADDRESS);
   Wire.write(address);
   Wire.endTransmission();
-  
+
   Wire.requestFrom(BMP085_ADDRESS, 2);
-  while(Wire.available()<2)
-    ;
+  while(Wire.available()<2);
+
   msb = Wire.read();
   lsb = Wire.read();
-  
+
   return (int) msb<<8 | lsb;
 }
 
@@ -183,53 +190,52 @@ int bmp085ReadInt(unsigned char address)
 unsigned int bmp085ReadUT()
 {
   unsigned int ut;
-  
+
   // Write 0x2E into Register 0xF4
   // This requests a temperature reading
   Wire.beginTransmission(BMP085_ADDRESS);
   Wire.write(0xF4);
   Wire.write(0x2E);
   Wire.endTransmission();
-  
+
   // Wait at least 4.5ms
   delay(5);
-  
+
   // Read two bytes from registers 0xF6 and 0xF7
   ut = bmp085ReadInt(0xF6);
   return ut;
 }
 
-// Read the uncompensated pressure value
+// Read the uncompensated bmp085_pressure value
 unsigned long bmp085ReadUP()
 {
   unsigned char msb, lsb, xlsb;
   unsigned long up = 0;
-  
-  // Write 0x34+(OSS<<6) into register 0xF4
+
+  // Write 0x34+(bmp085_OSS<<6) into register 0xF4
   // Request a pressure reading w/ oversampling setting
   Wire.beginTransmission(BMP085_ADDRESS);
   Wire.write(0xF4);
-  Wire.write(0x34 + (OSS<<6));
+  Wire.write(0x34 + (bmp085_OSS<<6));
   Wire.endTransmission();
-  
-  // Wait for conversion, delay time dependent on OSS
-  delay(2 + (3<<OSS));
-  
+
+  // Wait for conversion, delay time dependent on bmp085_OSS
+  delay(2 + (3<<bmp085_OSS));
+
   // Read register 0xF6 (MSB), 0xF7 (LSB), and 0xF8 (XLSB)
   Wire.beginTransmission(BMP085_ADDRESS);
   Wire.write(0xF6);
   Wire.endTransmission();
   Wire.requestFrom(BMP085_ADDRESS, 3);
-  
+
   // Wait for data to become available
   while(Wire.available() < 3)
     ;
   msb = Wire.read();
   lsb = Wire.read();
   xlsb = Wire.read();
-  
-  up = (((unsigned long) msb << 16) | ((unsigned long) lsb << 8) | (unsigned long) xlsb) >> (8-OSS);
-  
+
+  up = (((unsigned long) msb << 16) | ((unsigned long) lsb << 8) | (unsigned long) xlsb) >> (8-bmp085_OSS);
+
   return up;
 }
-
