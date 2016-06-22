@@ -3,6 +3,7 @@
 ////////////////////
 //
 // D2 HumidityAndTemperature
+// D7 RF Transmitter
 // D20 (SDA) BMP085
 // D21 (SCL) BMP085
 //
@@ -12,6 +13,7 @@
 // Dependencies
 #include <cactus_io_DHT22.h>
 #include <Wire.h>
+#include <VirtualWire.h>
 
 // Defines
 #define DHT22_PIN 2
@@ -26,6 +28,9 @@ DHT22 dht(DHT22_PIN);
 
 // Generals
 int led13Pin = 13;
+
+// RF Transmitter
+int rfDigInput = 7;
 
 // Moisture sensor
 int moisturePin = A0;
@@ -57,6 +62,35 @@ float bmp085_altitude;
 // Functions for each device
 
 // Format: sensorNameSetup() and sensorNameLoop()
+
+/////////////////////////////
+// RF Transmitter
+/////////////////////////////
+void transmitterRFSetup() {
+	vw_set_ptt_inverted(true);
+	vw_set_tx_pin(rfDigInput);
+	vw_setup(4000);
+}
+void transmitterRFLoop() {
+	// Process started indicator
+	digitalWrite(led13Pin, HIGH);
+
+	const char *msg = "Hola mundo!";
+	uint8_t buf[VW_MAX_MESSAGE_LEN];
+	uint8_t buflen = VW_MAX_MESSAGE_LEN;
+	vw_send((uint8_t *)msg, strlen(msg));
+	vw_wait_tx();
+	delay(500);
+	digitalWrite(led13Pin,0);
+	delay(500);
+
+  Serial.print("Sent: ");
+  Serial.println(*msg);
+	// Process finished indicator
+	digitalWrite(led13Pin, LOW);
+
+	delay(1000);
+}
 
 /////////////////////////////
 // MoistureEC5
@@ -285,6 +319,7 @@ void setup()
 	pinMode(led13Pin, OUTPUT);
 	humidityAndTemperatureSetup();
 	bmp085Setup();
+	transmitterRFSetup();
 }
 
 void loop()
@@ -293,4 +328,5 @@ void loop()
 	humidityAndTemperatureLoop();
 	lightSensorLoop();
 	bmp085Loop();
+	transmitterRFLoop();
 }
