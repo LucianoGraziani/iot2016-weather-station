@@ -7,7 +7,7 @@
 // D20 (SDA) BMP085
 // D21 (SCL) BMP085
 //
-// A6 LightSensor
+// A7 LightSensor
 // A0 MoistureEC5
 
 // Dependencies
@@ -37,7 +37,7 @@ int moisturePin = A0;
 int moistureValue = 0;
 
 // Light sensor
-int lightSensorPin = A6;
+int lightSensorPin = A7;
 int lightSensorValue = 0;
 
 // BMP085
@@ -301,7 +301,18 @@ void lightSensorLoop()
 
 	// TODO INIT: esto tiene que reemplazarse con el envío de los datos a internet
 	lightSensorValue = analogRead(lightSensorPin);
-	Serial.print("Light sensor: (0-1024 RAW ANALOG)"); Serial.println(lightSensorValue, DEC);
+	// We'll have a few threshholds, qualitatively determined
+	if (lightSensorValue < 10) {
+		Serial.println(" - Dark");
+	} else if (lightSensorValue < 200) {
+		Serial.println(" - Dim");
+	} else if (lightSensorValue < 500) {
+		Serial.println(" - Light");
+	} else if (lightSensorValue < 800) {
+		Serial.println(" - Bright");
+	} else {
+		Serial.println(" - Very bright");
+	}
 	// END
 
 	// Process finished indicator
@@ -324,9 +335,9 @@ void setup()
 
 void loop()
 {
-	moistureEC5Loop();
-	humidityAndTemperatureLoop();
-	lightSensorLoop();
-	bmp085Loop();
+	//moistureEC5Loop();
+	//humidityAndTemperatureLoop();
+	//lightSensorLoop();
+	//bmp085Loop();
 	transmitterRFLoop();
 }
