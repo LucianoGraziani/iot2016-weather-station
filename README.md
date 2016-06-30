@@ -1,11 +1,36 @@
 # Estación meteorológica
-Apliación desarrollada para la materia IoT de la Lic. en Sistemas para la cursada 2016.
+Apliación desarrollada para la materia IoT de la Lic. en Sistemas de la cursada 2016 para la Universidad Nacional de Río Negro, Argentina.
 
 ## Índice
 1. [Autores](#autores).
+2. [Documentación](#Documentación).
+3. [Estructura](#estructura).
 
 ## Autores
-- Luciano Graziani: <lgraziani@unrn.edu.ar>.
-- Emanuel Sanhueza: <msanhueza@unrn.edu.ar>.
+- Luciano Graziani @ <lgraziani@unrn.edu.ar>.
+- Emanuel Sanhueza @ <msanhueza@unrn.edu.ar>.
+
+## Docentes
+- Juan Cruz Martínez Luquez @ <jcmluquez@unrn.edu.ar>.
+- Guillermo Malpeli @ <gmalpeli@unrn.edu.ar>.
 
 ## Documentación
+Para el desarrollo de esta aplicación, se utilizaron las siguientes herramientas:
+
+- [Atom](https://atom.io/): como IDE.
+- [ArduinoIDE](https://www.arduino.cc/en/Main/Software): para deployar el código en la placa Arduino.
+- [Ubidots](http://ubidots.com/): plataforma para almacenar datos de IoT, mostrarlos, recibir notificaciones e interactuar con botones.
+
+A su vez, se utilizaron las siguientes librerías externas:
+
+- [Cactuis IO DHT22](http://static.cactus.io/downloads/library/dht22/cactus_io_DHT22.zip): para el manejo del sensor de temperatura y humedad.
+- [VirtualWire](http://www.airspayce.com/mikem/arduino/VirtualWire/): para el funcionamiento de los dispositivos de Radio Frecuencia.
+- [Ubidots Arduino Ethernet](https://github.com/ubidots/ubidots-arduino-ethernet/archive/master.zip): para la comunicación entre la estación madre y el servidor de datos.
+
+## Estructura
+En este prototipo implementamos dos tipos de arduino.
+
+1. El Arduino Mega se divide en tres partes. La primera, integrada a la placa, es el shield Ethernet que permite la conexión a la red y la comunicación con el servidor. Las otras dos partes se componen de todos los sensores, pudiendo diferenciarlas por su nivel de voltaje (5V y 3.3V). Además tiene un emisor de RF para enviar órdenes al otro Arduino.
+2. El Arduino Leonardo actúa como receptor del anterior, y está compuesto por un actuador simulado con un LED y por un receptor de RF.
+
+La comunicación entre Arduinos es unidireccional. En la cual el Arduino Mega le envía un "0" o un "1", según el estado del botón que se encuentra en el panel del servidor, y sirve para simular la apertura y clausura de una compuerta de riego.

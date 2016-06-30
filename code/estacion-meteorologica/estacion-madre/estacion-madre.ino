@@ -21,13 +21,13 @@
 // Defines
 #define DHT22_PIN 2
 #define BMP085_ADDRESS 0x77
-#define TOKEN  "YXCQHvPZJZsmGTt07FZDZNnGJRzCIM"  // Ubidots TOKEN
-#define ID_LUZ  "5772e2ee7625421453a672ba"
-#define ID_HUMEDAD_A "5772ec0576254254f2add036"
-#define ID_HUMEDAD_S "5772f883762542390fc777d2"
-#define ID_TEMP "576af1dc7625420953d4f33e"
-#define ID_LED "5773005d7625427307207e88"
-#define ID_PRESION "577485cf7625422cfff710d9" // Modificar en caso de agregarla
+#define TOKEN "LGk6YVMXHt0IMrP3yNSdi2gD9qUVVl" // Ubidots TOKEN
+#define ID_TEMP "577538f37625420423554b8a"
+#define ID_LUZ "577539807625420bedcf36c5"
+#define ID_HUMEDAD_S "5775398f7625420d17c89633"
+#define ID_HUMEDAD_A "577539a57625420e88a35b7b"
+#define ID_PRESION "577539c176254210088fc71a"
+#define ID_LED "577539d476254211509a5a3e"
 
 // Inicializations
 DHT22 dht(DHT22_PIN);
@@ -87,11 +87,16 @@ void transmitterRFSetup() {
 	vw_set_tx_pin(rfDigInput);
 	vw_setup(4000);
 }
-void transmitterRFLoop() {
+void transmitterRFLoop(float value) {
 	// Process started indicator
 	digitalWrite(led13Pin, HIGH);
 
-	const char *msg = "Hola mundo!";
+  const char *msg;
+  if(value == 1.00) {
+    msg = "1";
+  } else {
+    msg = "0";
+  }
 	uint8_t buf[VW_MAX_MESSAGE_LEN];
 	uint8_t buflen = VW_MAX_MESSAGE_LEN;
 	vw_send((uint8_t *)msg, strlen(msg));
@@ -100,8 +105,8 @@ void transmitterRFLoop() {
 	digitalWrite(led13Pin,0);
 	delay(500);
 
-  Serial.print("Sent: ");
-  Serial.println(*msg);
+	Serial.print("Sent: ");
+	Serial.println(*msg);
 	// Process finished indicator
 	digitalWrite(led13Pin, LOW);
 
@@ -129,9 +134,9 @@ void moistureEC5Loop()
 	// Reset analogReference
 	analogReference(DEFAULT);
 	//delay(1500);
-  
-  //send value to Ubidots
-  client.add(ID_HUMEDAD_S, moistureValue);
+
+	//send value to Ubidots
+	client.add(ID_HUMEDAD_S, moistureValue);
 }
 
 /////////////////////////////
@@ -169,8 +174,8 @@ void bmp085Loop()
 
 	//delay(2000);
 
-  // Send value to Ubidots
-  client.add(ID_PRESION, bmp085_pressure);
+	// Send value to Ubidots
+	client.add(ID_PRESION, bmp085_pressure);
 }
 void bmp085Calibration()
 {
@@ -312,9 +317,9 @@ void humidityAndTemperatureLoop()
 
 	//delay(2000);
 
-  // Send value to Ubidots
-  client.add(ID_HUMEDAD_A, dht.humidity);
-  client.add(ID_TEMP, dht.temperature_C);
+	// Send value to Ubidots
+	client.add(ID_HUMEDAD_A, dht.humidity);
+	client.add(ID_TEMP, dht.temperature_C);
 }
 
 /////////////////////////////
@@ -346,19 +351,19 @@ void lightSensorLoop()
 
 	//delay(2000);
 
-  // Send value to Ubidots
-  client.add(ID_LUZ, lightSensorValue);
+	// Send value to Ubidots
+	client.add(ID_LUZ, lightSensorValue);
 }
 
 /////////////////////////////
 // Ethernet
 /////////////////////////////
 void ethernetSetup(){
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println("Failed to configure Ethernet using DHCP");
-  }
-  // give the Ethernet shield a second to initialize:
-  delay(1000);
+	if (Ethernet.begin(mac) == 0) {
+		Serial.println("Failed to configure Ethernet using DHCP");
+	}
+	// give the Ethernet shield a second to initialize:
+	delay(1000);
 }
 
 /////////////////////////////
@@ -368,7 +373,7 @@ void setup()
 {
 	Serial.begin(9600);
 	pinMode(led13Pin, OUTPUT);
-  ethernetSetup();
+	ethernetSetup();
 	humidityAndTemperatureSetup();
 	bmp085Setup();
 	transmitterRFSetup();
@@ -380,9 +385,7 @@ void loop()
 	humidityAndTemperatureLoop();
 	lightSensorLoop();
 	bmp085Loop();
-  float value_id_led = client.getValue(ID_LED);
-  Serial.print("Activo? ");
-  Serial.println(value_id_led);
-  transmitterRFLoop();
-  client.sendAll();
+	float value_id_led = client.getValue(ID_LED);
+	transmitterRFLoop(value_id_led);
+	client.sendAll();
 }

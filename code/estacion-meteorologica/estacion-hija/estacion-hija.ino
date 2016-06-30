@@ -2,6 +2,9 @@
 
 int rfDigPin = 7;
 int led13Pin = 13;
+int relePin = 12;
+
+float actualValue = 0.00;
 
 void receiverRFSetup()
 {
@@ -21,11 +24,17 @@ void receiverRFLoop()
 
 		// TODO INIT: esto tiene que reemplazarse con el chequeo de los datos y la consecuente activación de algún relé
 		Serial.print("Got: ");
+		char c;
 		for (int i = 0; i < buflen; i++)
 		{
 			int a = buf[i];
-			char c = a;
+			c = a;
 			Serial.print(c);
+		}
+		if(c == '1') {
+			digitalWrite(relePin, HIGH);
+		} else {
+			digitalWrite(relePin, LOW);
 		}
 		Serial.println("");
 		// END
@@ -40,7 +49,8 @@ void receiverRFLoop()
 void setup()
 {
 	Serial.begin(9600);
-  pinMode(led13Pin, OUTPUT);
+	pinMode(led13Pin, OUTPUT);
+	pinMode(relePin, OUTPUT);
 	receiverRFSetup();
 }
 

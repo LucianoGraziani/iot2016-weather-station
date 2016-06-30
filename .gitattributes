@@ -32,4 +32,5 @@ artisan eol=lf
 *.data binary
 *.ttf binary
 *.docx binary
+*.xlsx binary
 *.pdf binary
