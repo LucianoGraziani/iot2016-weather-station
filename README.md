@@ -3,8 +3,9 @@ Apliación desarrollada para la materia IoT de la Lic. en Sistemas de la cursada
 
 ## Índice
 1. [Autores](#autores).
-2. [Documentación](#Documentación).
-3. [Estructura](#estructura).
+2. [Dashboard](#dashboard).
+3. [Documentación](#documentación).
+4. [Estructura](#estructura).
 
 ## Autores
 - Luciano Graziani @ <lgraziani@unrn.edu.ar>.
