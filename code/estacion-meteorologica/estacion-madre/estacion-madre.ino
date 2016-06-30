@@ -14,10 +14,20 @@
 #include <cactus_io_DHT22.h>
 #include <Wire.h>
 #include <VirtualWire.h>
+#include <Ethernet.h>
+#include <SPI.h>
+#include <UbidotsEthernet.h>
 
 // Defines
 #define DHT22_PIN 2
 #define BMP085_ADDRESS 0x77
+#define TOKEN  "YXCQHvPZJZsmGTt07FZDZNnGJRzCIM"  // Ubidots TOKEN
+#define ID_LUZ  "5772e2ee7625421453a672ba"
+#define ID_HUMEDAD_A "5772ec0576254254f2add036"
+#define ID_HUMEDAD_S "5772f883762542390fc777d2"
+#define ID_TEMP "576af1dc7625420953d4f33e"
+#define ID_LED "5773005d7625427307207e88"
+#define ID_PRESION "5772f80f76254235ab1a2459"
 
 // Inicializations
 DHT22 dht(DHT22_PIN);
@@ -25,6 +35,12 @@ DHT22 dht(DHT22_PIN);
 ////////////////////////////
 // Variables and constants
 ////////////////////////////
+
+// Ethernet
+byte mac[] = { 0x00, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
+
+//Ubidots
+Ubidots client(TOKEN);
 
 // Generals
 int led13Pin = 13;
@@ -93,7 +109,7 @@ void transmitterRFLoop() {
 }
 
 /////////////////////////////
-// MoistureEC5
+// MoistureEC5 - Humedad Suelo
 /////////////////////////////
 void moistureEC5Loop()
 {
@@ -112,11 +128,14 @@ void moistureEC5Loop()
 
 	// Reset analogReference
 	analogReference(DEFAULT);
-	delay(1500);
+	//delay(1500);
+  
+  //send value to Ubidots
+  client.add(ID_HUMEDAD_S, moistureValue);
 }
 
 /////////////////////////////
-// BMP085
+// BMP085 - Temp/Presion/Altitud
 /////////////////////////////
 void bmp085Setup()
 {
@@ -148,7 +167,10 @@ void bmp085Loop()
 	// Process finished indicator
 	digitalWrite(led13Pin, LOW);
 
-	delay(2000);
+	//delay(2000);
+
+  // Send value to Ubidots
+  client.add(ID_PRESION, bmp085_pressure);
 }
 void bmp085Calibration()
 {
@@ -288,7 +310,11 @@ void humidityAndTemperatureLoop()
 	// Process finished indicator
 	digitalWrite(led13Pin, LOW);
 
-	delay(2000);
+	//delay(2000);
+
+  // Send value to Ubidots
+  client.add(ID_HUMEDAD_A, dht.humidity);
+  client.add(ID_TEMP, dht.temperature_C);
 }
 
 /////////////////////////////
@@ -318,7 +344,21 @@ void lightSensorLoop()
 	// Process finished indicator
 	digitalWrite(led13Pin, LOW);
 
-	delay(2000);
+	//delay(2000);
+
+  // Send value to Ubidots
+  client.add(ID_LUZ, lightSensorValue);
+}
+
+/////////////////////////////
+// Ethernet
+/////////////////////////////
+void ethernetSetup(){
+  if (Ethernet.begin(mac) == 0) {
+    Serial.println("Failed to configure Ethernet using DHCP");
+  }
+  // give the Ethernet shield a second to initialize:
+  delay(1000);
 }
 
 /////////////////////////////
@@ -328,6 +368,7 @@ void setup()
 {
 	Serial.begin(9600);
 	pinMode(led13Pin, OUTPUT);
+  ethernetSetup();
 	humidityAndTemperatureSetup();
 	bmp085Setup();
 	transmitterRFSetup();
@@ -335,9 +376,11 @@ void setup()
 
 void loop()
 {
-	//moistureEC5Loop();
-	//humidityAndTemperatureLoop();
-	//lightSensorLoop();
-	//bmp085Loop();
-	transmitterRFLoop();
+	moistureEC5Loop();
+	humidityAndTemperatureLoop();
+	lightSensorLoop();
+	bmp085Loop();
+  //float value_id_led = client.getValue(ID_LED);
+  transmitterRFLoop();
+  client.sendAll();
 }
