@@ -27,7 +27,7 @@
 #define ID_HUMEDAD_S "5772f883762542390fc777d2"
 #define ID_TEMP "576af1dc7625420953d4f33e"
 #define ID_LED "5773005d7625427307207e88"
-#define ID_PRESION "5772f80f76254235ab1a2459"
+#define ID_PRESION "577485cf7625422cfff710d9" // Modificar en caso de agregarla
 
 // Inicializations
 DHT22 dht(DHT22_PIN);
@@ -380,7 +380,9 @@ void loop()
 	humidityAndTemperatureLoop();
 	lightSensorLoop();
 	bmp085Loop();
-  //float value_id_led = client.getValue(ID_LED);
+  float value_id_led = client.getValue(ID_LED);
+  Serial.print("Activo? ");
+  Serial.println(value_id_led);
   transmitterRFLoop();
   client.sendAll();
 }
