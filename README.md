@@ -3,9 +3,10 @@ Apliación desarrollada para la materia IoT de la Lic. en Sistemas de la cursada
 
 ## Índice
 1. [Autores](#autores).
-2. [Dashboard](#dashboard).
-3. [Documentación](#documentación).
-4. [Estructura](#estructura).
+2. [Docuentes](#docentes).
+3. [Dashboard](#dashboard).
+4. [Documentación](#documentacion).
+5. [Estructura](#estructura).
 
 ## Autores
 - Luciano Graziani @ <lgraziani@unrn.edu.ar>.
@@ -25,7 +26,7 @@ Apliación desarrollada para la materia IoT de la Lic. en Sistemas de la cursada
 
 **Warning!** The above account is merely educational, and doesn't have any kind of *sensitive* data. Please, don't try to change the password, or break anything, since the mail account it cannot be changed, we can get it back if someone with bad intentions change the password.
 
-## Documentación
+## Documentacion
 Para el desarrollo de esta aplicación, se utilizaron las siguientes herramientas:
 
 - [Atom](https://atom.io/): como IDE.
