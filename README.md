@@ -1,5 +1,5 @@
 # Estación meteorológica
-Apliación desarrollada para la materia IoT de la Lic. en Sistemas de la cursada 2016 para la Universidad Nacional de Río Negro, Argentina.
+Aplicación desarrollada para la materia IoT de la Licenciatura en Sistemas de la Universidad Nacional de Río Negro, Argentina. Cursada 2016.
 
 ## Índice
 1. [Autores](#autores).
