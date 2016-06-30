@@ -17,7 +17,9 @@ Apliación desarrollada para la materia IoT de la Lic. en Sistemas de la cursada
 ## Dashboard
 - Para acceder al panel de control del servidor desde una PC, haz clic aquí: https://app.ubidots.com/ubi/insights/#/list.
 - Para acceder desde un celular, escanea el siguiente código QR:
+
 ![QR-server](b283ee16adf97cdb919f55715f349f8d.png)
+
 - El usuario y la contraseña son: `iot.2016.unrn`.
 
 **Warning!** The above account is merely educational, and doesn't have any kind of *sensitive* data. Please, don't try to change the password, or break anything, since the mail account it cannot be changed, we can get it back if someone with bad intentions change the password.
